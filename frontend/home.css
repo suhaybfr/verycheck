@@ -1,0 +1,40 @@
+body{
+    background-color: #333;
+}
+/* Remove default list styling */
+ul.navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #171717; /* Navbar background color */
+    overflow: hidden;
+    display: flex;
+}
+
+/* Navbar links */
+ul.navbar li a {
+    display: block;
+    color: white; /* Link color */
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Change background on hover */
+ul.navbar li a:hover {
+    background-color: #575757;
+    color: #fff;
+}
+
+/* Active link style */
+ul.navbar li a.active {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color:rgb(131, 249, 210);  /* Highlight color for active page */
+    color: black;
+}
+
+/* Right-aligned item */
+ul.navbar li.Login {
+    margin-left: auto; /* Push this li to the right */
+}

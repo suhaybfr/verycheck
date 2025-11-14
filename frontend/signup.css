@@ -1,0 +1,97 @@
+/* --- Body and Page Layout --- */
+body {
+    background-color: #333;
+    color: #f0f0f0; /* Set a light text color for the dark background */
+    font-family: Arial, sans-serif; /* Add a clean default font */
+    
+    /* These 3 lines center the form vertically and horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    min-height: 100vh; /* Make the body fill the whole screen */
+    margin: 0; /* Remove default browser margin */
+}
+
+/* --- Main Content Area (holds form and link) --- */
+main {
+    width: 320px; /* Give the main container a set width */
+}
+
+/* --- Form Container --- */
+form {
+    background-color: #161616b9; 
+    border: 2px solid rgb(131, 249, 210); 
+    border-radius: 10px;
+    padding: 25px; /* Adds space INSIDE the box */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Form Heading --- */
+h1 {
+    text-align: center;
+    color: rgb(131, 249, 210); /* Match the border color */
+    margin-top: 0; /* Remove extra space at the top */
+}
+
+/* --- Labels (Username, Password, etc.) --- */
+label {
+    display: block; /* Make label take its own line */
+    margin-bottom: 5px; /* Space between label and input box */
+    font-weight: bold;
+}
+
+/* --- Input Fields --- */
+/* THIS IS THE SECTION WE UPDATED.
+  It now styles text, password, AND email fields.
+*/
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%; /* Make inputs fill the form container */
+    padding: 10px; /* Add space INSIDE the input boxes */
+    
+    /* This stops padding from making the box wider than 100% */
+    box-sizing: border-box; 
+    
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff; /* White text for typing */
+    margin-bottom: 15px; /* Space between the input fields */
+}
+
+/* --- Submit Button (Login / Create Account) --- */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: rgb(131, 249, 210);
+    color: #161616; /* Dark text for the light button */
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer; /* Show a hand icon on hover */
+    
+    /* Adds a smooth color change effect */
+    transition: background-color 0.3s ease;
+}
+
+/* --- Button Hover Effect --- */
+button[type="submit"]:hover {
+    background-color: rgb(100, 220, 180); /* A slightly different shade on hover */
+}
+
+p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+a {
+    color: rgb(131, 249, 210); /* Use the same accent color */
+    text-decoration: none; /* Remove the underline */
+}
+
+a:hover {
+    text-decoration: underline; /* Add underline back on hover */
+}

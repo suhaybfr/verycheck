@@ -1,0 +1,93 @@
+body {
+    background-color: #333;
+    color: #f0f0f0; 
+    font-family: Arial, sans-serif; 
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    min-height: 100vh; 
+    margin: 0; 
+}
+
+
+main {
+    width: 320px; 
+}
+
+form {
+    background-color: #161616b9; 
+    border: 2px solid rgb(131, 249, 210); 
+    border-radius: 10px;
+    
+    
+    padding: 25px; 
+    
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+h1 {
+    text-align: center;
+    color: rgb(131, 249, 210); 
+    margin-top: 0; 
+}
+
+
+label {
+    display: block; /* Make label take its own line */
+    margin-bottom: 5px; /* Space between label and input box */
+    font-weight: bold;
+}
+
+/* --- Input Fields (Text and Password) --- */
+input[type="text"],
+input[type="password"] {
+    width: 100%; /* Make inputs fill the form container */
+    padding: 10px; /* Add space INSIDE the input boxes */
+    
+    /* This stops padding from making the box wider than 100% */
+    box-sizing: border-box; 
+    
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff; /* White text for typing */
+    margin-bottom: 15px; /* Space between the input fields */
+}
+
+/* --- Login Button --- */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: rgb(131, 249, 210);
+    color: #161616; /* Dark text for the light button */
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer; /* Show a hand icon on hover */
+    
+    /* Adds a smooth color change effect */
+    transition: background-color 0.3s ease;
+}
+
+/* --- Button Hover Effect --- */
+button[type="submit"]:hover {
+    background-color: rgb(100, 220, 180); /* A slightly different shade on hover */
+}
+
+/* --- "Don't have an account?" Link --- */
+p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+a {
+    color: rgb(131, 249, 210); /* Use the same accent color */
+    text-decoration: none; /* Remove the underline */
+}
+
+a:hover {
+    text-decoration: underline; /* Add underline back on hover */
+}
