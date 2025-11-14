@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeryScan | Student</title>
+    
+    <!-- This is the library that makes the scanner work -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
+    <style>
+        /* --- Basic Styles --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: #f4f7f6;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        /* --- The Scanner Viewfinder --- */
+        #reader {
+            width: 90%;
+            max-width: 400px;
+            margin: 20px auto;
+            border: 4px solid #333;
+            border-radius: 12px;
+            overflow: hidden; /* Keeps the video feed rounded */
+        }
+
+        /* --- The Result Section (Hidden by default) --- */
+        .hidden {
+            display: none;
+        }
+
+        #result-section {
+            width: 90%;
+            max-width: 400px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #scanned-item-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            word-wrap: break-word;
+        }
+
+        /* --- Form Inputs --- */
+        #student-name {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box; /* Fixes padding issue */
+        }
+
+        /* --- Buttons --- */
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            margin-top: 10px;
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.98); /* Click effect */
+        }
+
+        .btn-checkout { background-color: #28a745; color: white; }
+        .btn-return { background-color: #007bff; color: white; }
+        .btn-flag { background-color: #dc3545; color: white; }
+        .btn-rescan { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+
+    <h1>📷 VeryScan</h1>
+
+    <!-- This div will be replaced by the camera feed -->
+    <div id="reader"></div>
+
+    <!-- This message shows before a scan is successful -->
+    <p id="scan-message">Scan a QR Code to borrow or return gear.</p>
+
+    <!-- This section is hidden until a scan is successful -->
+    <div id="result-section" class="hidden">
+        <h2 id="scanned-item-name">Item Detected!</h2>
+        <p>Please enter your name to check out.</p>
+
+        <!-- Input for student's name -->
+        <input type="text" id="student-name" placeholder="Enter Your Name">
+        
+        <!-- Action Buttons -->
+        <button class="btn-checkout" onclick="checkoutItem()">✅ Confirm Checkout</button>
+        <button class="btn-return" onclick="returnItem()">↩️ Return Item</button>
+        <button class="btn-flag" onclick="flagItem()">🚩 Flag as Broken/Missing</button>
+        <button class="btn-rescan" onclick="startScanning()">🔄 Scan Another</button>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT ---
+
+        let currentScannedId = null; // Stores the ID from the QR code
+
+        // IMPORTANT: This is the URL of your backend.
+        // If you test this on your phone, you MUST change 'localhost' to your 
+        // computer's IP address (e.g., "http://192.168.1.10:3000")
+        const SERVER_URL = "http://localhost:3000";
+
+        // Get references to the HTML elements
+        const readerElement = document.getElementById('reader');
+        const resultSection = document.getElementById('result-section');
+        const scanMessage = document.getElementById('scan-message');
+        const scannedItemName = document.getElementById('scanned-item-name');
+
+        // This is the main scanner object
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", // ID of the element to put the scanner in
+            { 
+                fps: 10, // Frames per second to scan
+                qrbox: { width: 250, height: 250 } // Size of the scan box
+            },
+            false // verbose (false = less console logs)
+        );
+
+        // This function runs when a QR code is successfully scanned
+        function onScanSuccess(decodedText, decodedResult) {
+            // decodedText is the data from the QR code (e.g., "arduino-1")
+            
+            // 1. Stop the camera
+            html5QrcodeScanner.clear();
+            
+            // 2. Hide the scanner box and "scan" message
+            readerElement.classList.add('hidden');
+            scanMessage.classList.add('hidden');
+
+            // 3. Store the scanned ID
+            currentScannedId = decodedText;
+            
+            // 4. Show the "result" section with the buttons
+            scannedItemName.innerText = "Item ID: " + currentScannedId;
+            resultSection.classList.remove('hidden');
+        }
+
+        // This function runs if the scanner fails (e.g., no camera)
+        function onScanFailure(error) {
+            console.warn(`QR code scan failed: ${error}`);
+        }
+
+        // --- BUTTON CLICK FUNCTIONS ---
+
+        // Called by the "Confirm Checkout" button
+        async function checkoutItem() {
+            const name = document.getElementById('student-name').value;
+            if (!name) {
+                alert("Please enter your name!");
+                return;
+            }
+
+            await sendRequest('/checkout', { itemId: currentScannedId, studentName: name });
+        }
+
+        // Called by the "Return Item" button
+        async function returnItem() {
+            await sendRequest('/return', { itemId: currentScannedId });
+        }
+
+        // Called by the "Flag as Broken" button
+        async function flagItem() {
+            if (confirm("Are you sure you want to flag this item for review?")) {
+                await sendRequest('/flag', { itemId: currentScannedId });
+            }
+        }
+
+        // Resets the page to start scanning again
+        function startScanning() {
+            // Just reload the page. It's the simplest way.
+            location.reload();
+        }
+
+        // --- HELPER FUNCTION ---
+        // This one function sends all our requests to the backend server
+        async function sendRequest(endpoint, body) {
+            try {
+                const response = await fetch(SERVER_URL + endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message); // Show success message from server
+                    startScanning(); // Go back to scanning
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                console.error("Failed to send request:", error);
+                alert("Could not connect to the server. Is it running?");
+            }
+        }
+
+        // --- START THE APP ---
+        // This is what starts the camera when the page loads
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+        // Make functions available to the HTML (for onclick)
+        window.checkoutItem = checkoutItem;
+        window.returnItem = returnItem;
+        window.flagItem = flagItem;
+        window.startScanning = startScanning;
+    </script>
+</body>
+</html>
